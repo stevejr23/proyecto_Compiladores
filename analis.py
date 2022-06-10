@@ -1,81 +1,54 @@
-import ply.lex as lex
+from curses.ascii import isdigit
 import codecs
 import os
 
-reservadas = ['Iron',  # If
-              'Majo',  # While
-              'Nadya',  # For
-              'return',
-              'Man',  # ifelse
-              'int',
-              'float']
-
-tokens = reservadas+['Id', 'Numero', 'Suma', 'Menos', 'Multi', 'Dividir', 'Modulo', 'Potencia',
-                     'Igual', 'Menor', 'MenorIgual', 'Mayor', 'MayorIgual', 'Diferente', 'DobleIgual',
-                     'And', 'OR', 'Not', 'ParentIrq', 'ParentDer', 'LlaveIrq', 'LlaveDer', 'PuntoYComa'
-                     ]
-
-# declaracion de los tokens
-
-t_ignore = '\t '
-t_Suma = r'\+'
-t_Menos = r'\-'
-t_Multi = r'\*'
-t_Dividir = r'/'
-t_Modulo = r'\%'
-t_Potencia = r'(\*{2} | \^)'
-t_Igual = r'='
-t_Menor = r'<'
-t_MenorIgual = r'<='
-t_Mayor = r'>'
-t_MayorIgual = r'>='
-t_Diferente = r'!='
-t_DobleIgual = r'=='
-t_And = r'\&'
-t_OR = r'\|'
-t_Not = r'\~'
-t_ParentIrq = r'\('
-t_ParentDer = r'\)'
-t_LlaveIrq = r'\{'
-t_LlaveDer = r'\}'
-t_PuntoYComa = r';'
-
-# identificador
-
-def t_Id(t):
-    r'[a-zA-Z][a-zA-Z]*'  # Reconocer todo el Abecedario En Mayuscula o Minuscula
-    if t.value.upper() in reservadas:
-        t.value = t.value.upper()  # Mayusculas
-        t.type = t.value  # Minusculas
-
-    return t
-
-# nueva linea
-
-def t_nuevalinea(t):
-    r'\n+'
-    t.lexer.lineno += len(t.value)
-
-# comentario
-
-def t_Comentario(t):
-    r'\#.*'
-    pass
-
-# numero
-
-def t_Numero(t):
-    r'\d+'
-    t.value = int(t.value)
-    return t
-
-# para el error
-
-def t_error(t):
-    print(chr(27)+"[1;35m"+"Caracter No Reconocido '%s'" % t.value[0])
-    t.lexer.skip(1)
-
-# busca y seleciona el fichero
+# Aritmeticos
+operador_aritmetico = [
+    '+',
+    '-',
+    '*',
+    '/',
+    '%',
+    '=']
+# Relacionales
+operador_relacionales = [
+    '<',
+    '>',
+    '<=',
+    '>=',
+    '!=',
+    '==']
+# Reservadas
+palabras_reservadas = [
+    'Iron',  # If
+    'Majo',  # While
+    'Nadya',  # For
+    'return',
+    'Man',  # ifelse
+    'int',
+    'float',
+    'inicio',
+    'fin']
+# Separadores
+separadores = ['(',
+               ')',
+               '{',
+               '}',
+               ';',
+               '$',
+               '[',
+               ']',
+               '"',
+               ' ']
+# Logicos
+operadores_logicos = [
+    '&',  # And
+    '|',  # Or
+    '~',  # Not
+    '&&',  # And
+    '||',  # Or
+]
+# busca y seleciona el archivo
 
 def buscarFicheros(directorio):
     ficheros = []
@@ -96,28 +69,39 @@ def buscarFicheros(directorio):
             if file == files[int(numArchivo)-1]:
                 respuesta = True
                 break
-
     print(chr(27) + "[1;33m"+"\nSeleccionste el archivo \"%s\" \n" %
           files[int(numArchivo)-1])
-
     return files[int(numArchivo)-1]
 
-directorio = 'Prueba/'
-archivo = buscarFicheros(directorio)
-test = directorio+archivo
+file = 'Prueba/'
+archivo = buscarFicheros(file)
+test = file + archivo
 fp = codecs.open(test, "r", "utf-8")
 cadena = fp.read()
+token = cadena.split()
+length = len(token)
 fp.close()
 
-analizador = lex.lex()
-analizador.input(cadena)
-i = 1 #Representa la línea
-while True:
-	tok = analizador.token()
-	if not tok : break
-	print ("\t"+str(i)+" - " +
-    "Linea: " + str(tok.lineno) + 
-    "\t Tipo: " + str(tok.type) + 
-    "\t Valor:  " + str(tok.value) + 
-    "\t Posicion -->  " + str(tok.lexpos))
-	i += 1
+for i in range(0, length):
+    if token[i] in operador_aritmetico:
+        print("Operador Aritmetico (", token[i], ")")
+    elif token[i] in operador_relacionales:
+        print("Operador Relacional (", token[i], ")")
+    elif token[i] in palabras_reservadas:
+        # if token[i].value.upper() in palabras_reservadas:
+        # i.value = i.value.upper()  # Mayusculas
+        # i.type = i.value  # Minusculas
+        print("Palabras Reservadas (", token[i], ")")
+    elif token[i] in separadores:
+        print("Separadores (", token[i], ")")
+    elif token[i] in operadores_logicos:
+        print("Operadores Logicos (", token[i], ")")
+    elif token[i].isdigit():
+        print("Esto es un digito (", token[i], ")")
+    elif token[i].islower():
+        print("Esto es un Texto (", token[i], ")")
+    else:
+        print("No pertenece al analizador lexico (", token[i],")") 
+
+        
+    
