@@ -1,3 +1,5 @@
+
+
 from curses.ascii import isdigit
 import codecs
 import os
@@ -73,7 +75,7 @@ def buscarFicheros(directorio):
           files[int(numArchivo)-1])
     return files[int(numArchivo)-1]
 
-file = 'Prueba/'
+file = 'proyecto_Compiladores/Prueba/'
 archivo = buscarFicheros(file)
 test = file + archivo
 fp = codecs.open(test, "r", "utf-8")
